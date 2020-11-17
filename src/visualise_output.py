@@ -11,6 +11,7 @@ def get_only_metrics(df):
     df = df[metrics]
     return df
 
+
 def bar_chart(df, title,x_label, labels):
     fig, ax = plt.subplots(1,figsize=(15, 5))
     x = np.arange(len(df.index))
@@ -46,20 +47,14 @@ def annotate_j48(plt):
 
 
 j48,randForest = read_config_csv()
-j48 = get_only_metrics(j48)
 
-
-# randForest = get_only_metrics(randForest)
-
-# j48plt, j48ax = bar_chart(j48)
-# j48plt = annotate_j48(j48plt)
-#j48plt.show()
-# print(randForest.loc[6:14,'TP Rate':].sort_values('NumIteration'))
-
+# Plot results of different J48 Configurations
+j48plt, j48ax = bar_chart(j48.iloc[:,5:],"Comparison of J48 Configurations", "Configurations", np.arange(15))
+j48plt = annotate_j48(j48plt)
+j48plt.show()
 
 # Plot results of changing number of iterations
-iterationLabels = np.sort(randForest.loc[6:13,'NumIteration'])
-RFIterations = randForest.iloc[6:14,:].sort_values('NumIteration')
-RFIterations = RFIterations.loc[:,'TP Rate':]
+iterationLabels = np.sort(np.unique(randForest.loc[:,'NumIteration']))
+RFIterations = randForest.iloc[6:15,:].sort_values('NumIteration').loc[:,'TP Rate':]
 rPlt, rAx = bar_chart(RFIterations,"Changing Number of Iterations","Iterations",iterationLabels)
 rPlt.show()
