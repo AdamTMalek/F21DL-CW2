@@ -11,7 +11,7 @@ def get_only_metrics(df):
     df = df[metrics]
     return df
 
-def bar_chart(df):
+def bar_chart(df, title,x_label, labels):
     fig, ax = plt.subplots(1,figsize=(15, 5))
     x = np.arange(len(df.index))
 
@@ -25,11 +25,11 @@ def bar_chart(df):
 
     # Fix the x-axes.
     ax.set_xticks(x + bar_width / 2)
-    ax.set_xticklabels(x)
+    ax.set_xticklabels(labels)
     ax.legend(df.columns, loc="center left",bbox_to_anchor=(1, 0.5))
-    ax.set_xlabel('Configurations')
+    ax.set_xlabel(x_label)
     ax.set_ylabel('Score')
-    ax.set_title("Comparison of Decision Tree Configurations")
+    ax.set_title(title)
 
 
     return plt, ax
@@ -47,10 +47,19 @@ def annotate_j48(plt):
 
 j48,randForest = read_config_csv()
 j48 = get_only_metrics(j48)
-randForest = get_only_metrics(randForest)
 
-j48plt, j48ax = bar_chart(j48)
-j48plt = annotate_j48(j48plt)
-j48plt.show()
 
-bar_chart(randForest)
+# randForest = get_only_metrics(randForest)
+
+# j48plt, j48ax = bar_chart(j48)
+# j48plt = annotate_j48(j48plt)
+#j48plt.show()
+# print(randForest.loc[6:14,'TP Rate':].sort_values('NumIteration'))
+
+
+# Plot results of changing number of iterations
+iterationLabels = np.sort(randForest.loc[6:13,'NumIteration'])
+RFIterations = randForest.iloc[6:14,:].sort_values('NumIteration')
+RFIterations = RFIterations.loc[:,'TP Rate':]
+rPlt, rAx = bar_chart(RFIterations,"Changing Number of Iterations","Iterations",iterationLabels)
+rPlt.show()
