@@ -12,7 +12,7 @@ def get_only_metrics(df):
     return df
 
 
-def bar_chart(df, title,x_label, labels):
+def bar_chart(df, title,x_label, labels, value_labels = False):
     fig, ax = plt.subplots(1,figsize=(15, 5))
     x = np.arange(len(df.index))
 
@@ -21,8 +21,10 @@ def bar_chart(df, title,x_label, labels):
     counter =0
     for i in df.columns:
         bar = ax.bar(x+(bar_width*counter), df[i],
-                 width=bar_width)
+                 width=bar_width, tick_label="hi")
         counter = counter +1
+        if value_labels is True:
+            draw_value_labels(bar,ax)
 
     # Fix the x-axes.
     ax.set_xticks(x + bar_width / 2)
@@ -32,8 +34,18 @@ def bar_chart(df, title,x_label, labels):
     ax.set_ylabel('Score')
     ax.set_title(title)
 
-
     return plt, ax
+
+
+def draw_value_labels(bar,ax):
+    for rect in bar:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+            xy=(rect.get_x() + rect.get_width() / 2, height),
+            xytext=(0, 3),  # 3 points vertical offset
+            textcoords="offset points",
+            ha='center', va='bottom', fontsize=6)
+ 
 
 def annotate_j48(plt):
     plt.annotate('Accuracy decreases upon changing min number of instances per leaf',
@@ -57,4 +69,19 @@ j48plt.show()
 iterationLabels = np.sort(np.unique(randForest.loc[:,'NumIteration']))
 RFIterations = randForest.iloc[6:15,:].sort_values('NumIteration').loc[:,'TP Rate':]
 rPlt, rAx = bar_chart(RFIterations,"Changing Number of Iterations","Iterations",iterationLabels)
+rPlt.show()
+
+
+# Plot results of changing max depth
+maxDepthLabels = np.sort(np.unique(randForest.loc[:,'Max Depth']))
+RFMaxDepth = randForest.iloc[22:,:].sort_values('Max Depth').loc[:,'TP Rate':]
+rPlt, rAx = bar_chart(RFMaxDepth,"Changing Max Depth","Max Depth",maxDepthLabels[1:])
+rPlt.show()
+
+# Plot results of changing bag size percentage
+bagSizeLabels = np.sort(np.unique(randForest.loc[:,'Bag Size Percent']))
+RFMaxDepth = randForest.iloc[14:18,:].sort_values('Bag Size Percent').loc[:,'TP Rate':]
+rPlt, rAx = bar_chart(RFMaxDepth,"Changing Bag Size Percentage","Bag Size Percentage (%)",bagSizeLabels[1:],value_labels=True)
+
+
 rPlt.show()
