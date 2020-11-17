@@ -45,19 +45,6 @@ def annotate_j48(plt):
     return plt
 
 
-def parallel_plot(x_data):
-    fig, ax = plt.subplots(1)
-
-    fig = pd.pandas.plotting.parallel_coordinates(
-        x_data, 'Index', linewidth=0.3, axvlines=False)
-    ax.set_xlabel('Metrics')
-    ax.set_ylabel('Score')
-    ax.set_xticklabels(['TP Rate','FP Rate'  ,'Precision'  ,'Recall'  ,'F Measure'  ,'ROC Areas'])
-    ax.set_title("Comparison of Decision Tree Configurations")
-    ax.legend(title='Config')
-    plt.show()
-
-
 j48,randForest = read_config_csv()
 j48 = get_only_metrics(j48)
 randForest = get_only_metrics(randForest)
