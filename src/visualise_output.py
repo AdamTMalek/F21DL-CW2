@@ -11,7 +11,7 @@ def get_only_metrics(df):
     df = df[metrics]
     return df
 
-def bar_chart_j48(df):
+def bar_chart(df):
     fig, ax = plt.subplots(1,figsize=(15, 5))
     x = np.arange(len(df.index))
 
@@ -31,16 +31,18 @@ def bar_chart_j48(df):
     ax.set_ylabel('Score')
     ax.set_title("Comparison of Decision Tree Configurations")
 
-    # plt.annotate('Accuracy decreases upon changing min number of instances per leaf',
-    #             xy=(12, 0.8),
-    #             xytext=(0.55, 0.82),
-    #             textcoords='figure fraction',
-    #             fontsize=8,
-    #             arrowprops=dict(facecolor='black', shrink=0.1)
-    #             )
 
+    return plt, ax
 
-    plt.show()
+def annotate_j48(plt):
+    plt.annotate('Accuracy decreases upon changing min number of instances per leaf',
+            xy=(12, 0.8),
+            xytext=(0.55, 0.82),
+            textcoords='figure fraction',
+            fontsize=8,
+            arrowprops=dict(facecolor='black', shrink=0.1)
+            )
+    return plt
 
 
 def parallel_plot(x_data):
@@ -60,5 +62,8 @@ j48,randForest = read_config_csv()
 j48 = get_only_metrics(j48)
 randForest = get_only_metrics(randForest)
 
-bar_chart_j48(j48)
-bar_chart_j48(randForest)
+j48plt, j48ax = bar_chart(j48)
+j48plt = annotate_j48(j48plt)
+j48plt.show()
+
+bar_chart(randForest)
