@@ -1,10 +1,12 @@
 import os
+import random
 import shutil
 from pathlib import Path
 
 from src.data import get_data_dir_path
 
 DATA_DIR = get_data_dir_path()
+DATA_SIZE = 9690
 
 
 def construct_test_set(number_of_instances: int):
@@ -78,18 +80,18 @@ def __move_instances(data_file_path: str, test_file_path: str, number_of_instanc
     data_file_copy_path = f'{data_file_path}.copy'
     shutil.move(data_file_path, data_file_copy_path)
 
+    lines_to_take = set(random.sample(range(DATA_SIZE), number_of_instances))  # Lines to take to the test file
+
     with open(data_file_copy_path, 'r') as data_file_copy:
         with open(data_file_path, 'w+') as data_file:
             with open(test_file_path, 'a') as test_file:
                 data_file.write(data_file_copy.readline())  # Copy the header line
 
-                # Move the {number_of_instances} instances to the test file
-                for i in range(number_of_instances):
-                    test_file.write(data_file_copy.readline())
-
-                # Copy the rest over to the modified data file
-                for line in data_file_copy:
-                    data_file.write(line)
+                for index, line in enumerate(data_file_copy):
+                    if index in lines_to_take:
+                        test_file.write(line)
+                    else:
+                        data_file.write(line)
 
     # Delete the copy
     os.remove(data_file_copy_path)
