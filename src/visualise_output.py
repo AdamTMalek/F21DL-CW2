@@ -68,20 +68,24 @@ j48plt.show()
 # Plot results of changing number of iterations
 iterationLabels = np.sort(np.unique(randForest.loc[:,'NumIteration']))
 RFIterations = randForest.iloc[6:15,:].sort_values('NumIteration').loc[:,'TP Rate':]
-rPlt, rAx = bar_chart(RFIterations,"Changing Number of Iterations","Iterations",iterationLabels)
+rPlt, rAx = bar_chart(RFIterations,"Changing Number of Iterations of Random Forest","Iterations",iterationLabels)
 rPlt.show()
 
 
-# Plot results of changing max depth
+# Plot results of changing max depth of Random Forest
 maxDepthLabels = np.sort(np.unique(randForest.loc[:,'Max Depth']))
 RFMaxDepth = randForest.iloc[22:,:].sort_values('Max Depth').loc[:,'TP Rate':]
-rPlt, rAx = bar_chart(RFMaxDepth,"Changing Max Depth","Max Depth",maxDepthLabels[1:])
+rPlt, rAx = bar_chart(RFMaxDepth,"Changing Max Depth of Random Forest","Max Depth",maxDepthLabels[1:])
 rPlt.show()
 
 # Plot results of changing bag size percentage
 bagSizeLabels = np.sort(np.unique(randForest.loc[:,'Bag Size Percent']))
 RFMaxDepth = randForest.iloc[14:18,:].sort_values('Bag Size Percent').loc[:,'TP Rate':]
-rPlt, rAx = bar_chart(RFMaxDepth,"Changing Bag Size Percentage","Bag Size Percentage (%)",bagSizeLabels[1:],value_labels=True)
+rPlt, rAx = bar_chart(RFMaxDepth,"Changing Bag Size Percentage of Random Forest","Bag Size Percentage (%)",bagSizeLabels[1:],value_labels=True)
+rPlt.show()
 
-
+# Plot results of changing seed
+seedLabels = np.sort(np.unique(randForest.loc[:,'Seed']))
+RFSeed = randForest.iloc[18:22,:].sort_values('Seed').loc[:,'TP Rate':]
+rPlt, rAx = bar_chart(RFSeed,"Changing Seed of Random Forest","Seed",bagSizeLabels[1:],value_labels=True)
 rPlt.show()
