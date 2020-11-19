@@ -69,7 +69,6 @@ class Weka:
         :param input_file_path: Input file to be processed. Can be either ARFF or CSV.
         :param output_file_path: ARFF Output file with only the selected attributes
         :param attributes: Attributes to take
-        :param weka_jar_path: Path to the Weka's jar.
         """
         # The -V flag inverts the selection.
         subprocess.call(['java', '-cp', str(self.weka_jar_path), 'weka.filters.unsupervised.attribute.Remove', '-V',
