@@ -39,13 +39,13 @@ def select_top_correlating_attrs(input_file_path: Path, output_file_path: Path, 
     return get_attributes_of_arff_file(output_file_path)
 
 
-def get_attributes_of_arff_file(file_path: str) -> FrozenSet[int]:
+def get_attributes_of_arff_file(file_path: Path) -> FrozenSet[int]:
     """
     Finds what attributes are used by the given file
     :param file_path: ARFF file
     :return: Immutable set of attributes without the class attribute.
     """
-    if not file_path.endswith('.arff'):
+    if not file_path.name.endswith('.arff'):
         raise ValueError("Only arff files are supported by this function")
 
     attributes = set()
