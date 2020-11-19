@@ -19,6 +19,7 @@ def construct_test_set(number_of_instances: int, weka_jar_path: Path):
     
     The script does not modify the original files, instead it creates a copy of them.
     :param number_of_instances: Number of instances to move from the training set to the testing set
+    :param weka_jar_path: Path to Weka's jar
     """
     test_dir_path = __create_test_dir(number_of_instances)
 
