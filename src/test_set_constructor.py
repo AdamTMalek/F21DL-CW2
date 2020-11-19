@@ -2,30 +2,65 @@ import os
 import random
 import shutil
 from pathlib import Path
+from typing import Iterable
 
 from src.data import get_data_dir_path
+from src.weka import Weka
 
 DATA_DIR = get_data_dir_path()
 DATA_SIZE = 9690
+TOP_ATTRS_TO_TAKE = 50  # Number of top correlating attributes (pixels) to take
 
 
-def construct_test_set(number_of_instances: int):
+def construct_test_set(number_of_instances: int, weka_jar_path: Path):
     """
     Creates a new directory in the data directory and moves the specified number of instances
     from the original training set (x_train_gr_smpl.csv) the testing set (y_test_smpl.csv).
     
     The script does not modify the original files, instead it creates a copy of them.
     :param number_of_instances: Number of instances to move from the training set to the testing set
+    :param weka_jar_path: Path to Weka's jar
     """
     test_dir_path = __create_test_dir(number_of_instances)
-    merged_train_file = str(test_dir_path.joinpath('train.csv'))
-    merged_test_file = str(test_dir_path.joinpath('test.csv'))
-    merge_class_attribute(f'{DATA_DIR}/x_train_gr_smpl.csv', f'{DATA_DIR}/y_train_smpl.csv', merged_train_file)
-    merge_class_attribute(f'{DATA_DIR}/x_test_gr_smpl.csv', f'{DATA_DIR}/y_test_smpl.csv', merged_test_file)
-    __move_instances(merged_train_file, merged_test_file, number_of_instances)
+
+    merged_train_csv_file = test_dir_path.joinpath('train.csv')
+    merged_test_csv_file = test_dir_path.joinpath('test.csv')
+    merge_class_attribute(Path(DATA_DIR).joinpath('x_train_gr_smpl.csv'),
+                          Path(DATA_DIR).joinpath('y_train_smpl.csv'),
+                          merged_train_csv_file)
+    merge_class_attribute(Path(DATA_DIR).joinpath('x_test_gr_smpl.csv'),
+                          Path(DATA_DIR).joinpath('y_test_smpl.csv'),
+                          merged_test_csv_file)
+    __move_instances(merged_train_csv_file, merged_test_csv_file, number_of_instances)
+
+    weka = Weka(weka_jar_path)
+    __apply_numeric_to_nominal_filter((merged_train_csv_file, merged_test_csv_file), weka)
+
+    # Apply the attribute selection to get the top correlating attributes (pixels)
+    arff_train_file = test_dir_path.joinpath('train.arff')  # Created by the __apply_numeric_to_nominal_filter function
+    arff_train_reduced_attrs_file = test_dir_path.joinpath(f'train_{TOP_ATTRS_TO_TAKE}_attrs.arff')
+    attributes = weka.select_top_correlating_attrs(arff_train_file, arff_train_reduced_attrs_file, TOP_ATTRS_TO_TAKE)
+
+    # Take the same attributes and filter them from the test
+    arff_test_file = test_dir_path.joinpath('test.arff')  # Created by the __apply_numeric_to_nominal_filter function
+    arff_test_reduced_attrs_file = test_dir_path.joinpath(f'test_{TOP_ATTRS_TO_TAKE}_attrs.arff')
+    weka.filter_attributes(arff_test_file, arff_test_reduced_attrs_file, attributes)
+
+    # Remove CSV files
+    os.remove(merged_train_csv_file.absolute())
+    os.remove(merged_test_csv_file.absolute())
 
 
-def merge_class_attribute(data_file_path: str, attributes_file_path: str, dest_path: str):
+def __apply_numeric_to_nominal_filter(files: Iterable[Path], weka: Weka):
+    for file in files:
+        directory = file.parent
+        arff_name = file.stem + '.arff'
+        arff_file_path = directory.joinpath(arff_name)
+
+        weka.set_class_attr_to_nominal(file, arff_file_path)
+
+
+def merge_class_attribute(data_file_path: Path, attributes_file_path: Path, dest_path: Path):
     """
     Merges the class attribute together with the data file.
 
@@ -68,7 +103,7 @@ def __create_test_dir(number_of_instances: int) -> Path:
     return path
 
 
-def __move_instances(data_file_path: str, test_file_path: str, number_of_instances: int):
+def __move_instances(data_file_path: Path, test_file_path: Path, number_of_instances: int):
     """
     Moves the specified number of instances from one file to the other.
 

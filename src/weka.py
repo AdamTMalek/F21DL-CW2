@@ -72,5 +72,5 @@ class Weka:
         """
         # The -V flag inverts the selection.
         subprocess.call(['java', '-cp', str(self.weka_jar_path), 'weka.filters.unsupervised.attribute.Remove', '-V',
-                         '-R', ','.join(str(attr) for attr in attributes), '-i', input_file_path, '-o',
+                         '-R', ','.join(str(attr) for attr in attributes) + ',last', '-i', input_file_path, '-o',
                          output_file_path])
