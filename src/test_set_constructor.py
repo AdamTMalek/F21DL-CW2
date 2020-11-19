@@ -24,9 +24,13 @@ def construct_test_set(number_of_instances: int, weka_jar_path: Path):
 
     merged_train_csv_file = test_dir_path.joinpath('train.csv')
     merged_test_csv_file = test_dir_path.joinpath('test.csv')
-    merge_class_attribute(f'{DATA_DIR}/x_train_gr_smpl.csv', f'{DATA_DIR}/y_train_smpl.csv', str(merged_train_csv_file))
-    merge_class_attribute(f'{DATA_DIR}/x_test_gr_smpl.csv', f'{DATA_DIR}/y_test_smpl.csv', str(merged_test_csv_file))
-    __move_instances(str(merged_train_csv_file), str(merged_test_csv_file), number_of_instances)
+    merge_class_attribute(Path(DATA_DIR).joinpath('x_train_gr_smpl.csv'),
+                          Path(DATA_DIR).joinpath('y_train_smpl.csv'),
+                          merged_train_csv_file)
+    merge_class_attribute(Path(DATA_DIR).joinpath('x_test_gr_smpl.csv'),
+                          Path(DATA_DIR).joinpath('y_test_smpl.csv'),
+                          merged_test_csv_file)
+    __move_instances(merged_train_csv_file, merged_test_csv_file, number_of_instances)
 
     weka = Weka(weka_jar_path)
     __apply_numeric_to_nominal_filter((merged_train_csv_file, merged_test_csv_file), weka)
@@ -55,7 +59,7 @@ def __apply_numeric_to_nominal_filter(files: Iterable[Path], weka: Weka):
         weka.set_class_attr_to_nominal(file, arff_file_path)
 
 
-def merge_class_attribute(data_file_path: str, attributes_file_path: str, dest_path: str):
+def merge_class_attribute(data_file_path: Path, attributes_file_path: Path, dest_path: Path):
     """
     Merges the class attribute together with the data file.
 
@@ -98,7 +102,7 @@ def __create_test_dir(number_of_instances: int) -> Path:
     return path
 
 
-def __move_instances(data_file_path: str, test_file_path: str, number_of_instances: int):
+def __move_instances(data_file_path: Path, test_file_path: Path, number_of_instances: int):
     """
     Moves the specified number of instances from one file to the other.
 
