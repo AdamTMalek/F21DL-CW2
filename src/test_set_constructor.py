@@ -41,6 +41,10 @@ def construct_test_set(number_of_instances: int, weka_jar_path: Path):
     arff_test_reduced_attrs_file = test_dir_path.joinpath(f'test_{TOP_ATTRS_TO_TAKE}_attrs.arff')
     weka.filter_attributes(arff_test_file, arff_test_reduced_attrs_file, attributes)
 
+    # Remove CSV files
+    os.remove(merged_train_csv_file.absolute())
+    os.remove(merged_test_csv_file.absolute())
+
 
 def __apply_numeric_to_nominal_filter(files: Iterable[Path], weka: Weka):
     for file in files:
