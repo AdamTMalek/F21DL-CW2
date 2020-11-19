@@ -61,14 +61,27 @@ def get_attributes_of_arff_file(file_path: Path) -> FrozenSet[int]:
     return frozenset(attributes)  # Return as immutable
 
 
+def filter_attributes(input_file_path: Path, output_file_path: Path, attributes: FrozenSet[int], weka_jar_path: Path):
+    """
+    Filters from the input file only the attributes that are in the given set and saves them to the output file.
+
+    :param input_file_path: Input file to be processed. Can be either ARFF or CSV.
+    :param output_file_path: ARFF Output file with only the selected attributes
+    :param attributes: Attributes to take
+    :param weka_jar_path: Path to the Weka's jar.
+    """
+    # The -V flag inverts the selection.
+    subprocess.call(['java', '-cp', weka_jar_path, 'weka.filters.unsupervised.attribute.Remove', '-V',
+                     '-R', ','.join(str(attr) for attr in attributes), '-i', input_file_path, '-o', output_file_path])
+
+
 if __name__ == "__main__":
     # TODO: Remove after implementing all things
     weka_path = Path.home().joinpath('weka-3-8-4/weka.jar')
-    input_path = Path.home().joinpath('PycharmProjects/F21DL-CW2/data/4000_instances/train.csv')
+    input_path = Path.home().joinpath('PycharmProjects/F21DL-CW2/data/x_train_gr_smpl.csv')
     filtered_output_path = Path.home().joinpath('PycharmProjects/F21DL-CW2/data/!filtered.arff')
+    attr_filtered_path = Path.home().joinpath('PycharmProjects/F21DL-CW2/data/!attr-filtered.arff')
     corr_output_path = Path.home().joinpath('PycharmProjects/F21DL-CW2/data/!corr.arff')
 
-    set_class_attr_to_nominal(input_path, filtered_output_path, weka_path)
     attributes = select_top_correlating_attrs(filtered_output_path, corr_output_path, 50, weka_path)
-    print(attributes)
-    print(len(attributes))
+    filter_attributes(input_path, attr_filtered_path, attributes, weka_path)
