@@ -1,7 +1,7 @@
 import os
 import re
 from pathlib import Path
-from typing import FrozenSet
+from typing import FrozenSet,List
 
 
 class Weka:
@@ -23,7 +23,7 @@ class Weka:
         os.system(command)
 
     def select_top_correlating_attrs(self, input_file_path: Path,
-                                     output_file_path: Path, attributes_to_take: int) -> FrozenSet[int]:
+                                     output_file_path: Path, attributes_to_take: int) -> List[int]:
         """
         Applies Weka's attribute selection using CorrelationAttributeEval evaluator.
 
@@ -42,7 +42,7 @@ class Weka:
         return self.get_attributes_of_arff_file(output_file_path)
 
     @staticmethod
-    def get_attributes_of_arff_file(file_path: Path) -> FrozenSet[int]:
+    def get_attributes_of_arff_file(file_path: Path) -> List[int]:
         """
         Finds what attributes are used by the given file
         :param file_path: ARFF file
@@ -51,7 +51,7 @@ class Weka:
         if not file_path.name.endswith('.arff'):
             raise ValueError("Only arff files are supported by this function")
 
-        attributes = set()
+        attributes = list()
         regex = re.compile(r'(\d+) numeric')
         with open(file_path) as file:
             for line in file:
@@ -60,10 +60,10 @@ class Weka:
                 if '@attribute' in line:
                     match = regex.search(line)
                     if match:
-                        attributes.add(int(match.group(1)))
-        return frozenset(attributes)  # Return as immutable
+                        attributes.append(int(match.group(1)))
+        return attributes  # Return as immutable
 
-    def filter_attributes(self, input_file_path: Path, output_file_path: Path, attributes: FrozenSet[int]):
+    def filter_attributes(self, input_file_path: Path, output_file_path: Path, attributes: List[int]):
         """
         Filters from the input file only the attributes that are in the given set and saves them to the output file.
 
@@ -73,7 +73,7 @@ class Weka:
         """
         # The -V flag inverts the selection.
         command = ' '.join(['java', '-cp', f'"{self.weka_jar_path}"', 'weka.filters.unsupervised.attribute.Remove',
-                            '-V', '-R', ','.join(str(attr + 1) for attr in attributes) + ',last',
+                            '-V', '-R', ','.join(str(attr + 1) for attr in attributes),
                             '-i', f'"{input_file_path}"', '-o', f'"{output_file_path}"'])
         os.system(command)
 
