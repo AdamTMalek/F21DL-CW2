@@ -74,3 +74,13 @@ class Weka:
         subprocess.call(['java', '-cp', str(self.weka_jar_path), 'weka.filters.unsupervised.attribute.Remove', '-V',
                          '-R', ','.join(str(attr + 1) for attr in attributes) + ',last', '-i', input_file_path, '-o',
                          output_file_path])
+
+    def arff_to_csv(self, input_file_path: Path, output_file_path: Path):
+        """
+        Coverts the given arff input file to csv
+
+        :param input_file_path: ARFF input file to be converted.
+        :param output_file_path: CSV output file.
+        """
+        subprocess.call(['java', '-cp', str(self.weka_jar_path), 'weka.core.converters.CSVSaver', '-i',
+                         str(input_file_path), '-o', str(output_file_path)])
