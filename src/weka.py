@@ -1,6 +1,5 @@
 import os
 import re
-import subprocess
 from pathlib import Path
 from typing import FrozenSet
 
@@ -18,8 +17,10 @@ class Weka:
         :param input_file_path: CSV or ARFF file
         :param output_file_path: ARFF output file with the applied filter
         """
-        subprocess.call(['java', '-cp', self.weka_jar_path, 'weka.filters.unsupervised.attribute.NumericToNominal',
-                         '-R', 'last', '-i', input_file_path, '-o', output_file_path])
+        command = ' '.join(['java', '-cp', f'"{self.weka_jar_path}"',
+                            'weka.filters.unsupervised.attribute.NumericToNominal', '-R', 'last',
+                            '-i', f'"{input_file_path}"', '-o', f'"{output_file_path}"'])
+        os.system(command)
 
     def select_top_correlating_attrs(self, input_file_path: Path,
                                      output_file_path: Path, attributes_to_take: int) -> FrozenSet[int]:
@@ -34,9 +35,9 @@ class Weka:
         RANKER_THRESHOLD = '-1.7976931348623157E308'  # Picked by Weka automatically
         search_method = f'weka.attributeSelection.Ranker -T {RANKER_THRESHOLD} -N {attributes_to_take}'
         command = ' '.join(
-            ['java', '-cp', str(self.weka_jar_path), 'weka.filters.supervised.attribute.AttributeSelection',
+            ['java', '-cp', f'"{self.weka_jar_path}"', 'weka.filters.supervised.attribute.AttributeSelection',
              '-E', 'weka.attributeSelection.CorrelationAttributeEval', '-S', f'"{search_method}"',
-             '-i', str(input_file_path), '-o', str(output_file_path)])
+             '-i', f'"{input_file_path}"', '-o', f'"{output_file_path}"'])
         os.system(command)
         return self.get_attributes_of_arff_file(output_file_path)
 
@@ -71,9 +72,10 @@ class Weka:
         :param attributes: Attributes to take
         """
         # The -V flag inverts the selection.
-        subprocess.call(['java', '-cp', str(self.weka_jar_path), 'weka.filters.unsupervised.attribute.Remove', '-V',
-                         '-R', ','.join(str(attr + 1) for attr in attributes) + ',last', '-i', input_file_path, '-o',
-                         output_file_path])
+        command = ' '.join(['java', '-cp', f'"{self.weka_jar_path}"', 'weka.filters.unsupervised.attribute.Remove',
+                            '-V', '-R', ','.join(str(attr + 1) for attr in attributes) + ',last',
+                            '-i', f'"{input_file_path}"', '-o', f'"{output_file_path}"'])
+        os.system(command)
 
     def arff_to_csv(self, input_file_path: Path, output_file_path: Path):
         """
@@ -82,5 +84,6 @@ class Weka:
         :param input_file_path: ARFF input file to be converted.
         :param output_file_path: CSV output file.
         """
-        subprocess.call(['java', '-cp', str(self.weka_jar_path), 'weka.core.converters.CSVSaver', '-i',
-                         str(input_file_path), '-o', str(output_file_path)])
+        command = ' '.join(['java', '-cp', f'"{self.weka_jar_path}"', 'weka.core.converters.CSVSaver', '-i',
+                            f'"{input_file_path}"', '-o', f'"{output_file_path}"'])
+        os.system(command)
