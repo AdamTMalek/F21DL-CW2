@@ -11,7 +11,6 @@ from data import get_data_dir_path
 from neural_attr_selection import TOP_SELECTED_FEATURES
 
 DATA_PATH = get_data_dir_path()
-SEED = 10
 
 
 def get_scores(classifier, ten_fold: bool, images: DataFrame, classes: DataFrame) -> Dict:
@@ -38,7 +37,7 @@ def get_scores(classifier, ten_fold: bool, images: DataFrame, classes: DataFrame
     return result
 
 
-def print_scores(scores: Dict) -> None:
+def print_scores(scores: Dict, classifier_type: str, seed_value: int, model_parameters) -> None:
     print(f'Accuracy: {scores["accuracy"]}')
     print(f'Precision: {scores["precision"]}')
     # print(f'Average precision: {scores["average_precision"]}')        #Used for One v Rest
@@ -49,20 +48,21 @@ def print_scores(scores: Dict) -> None:
     print(f'ROC area: {scores["roc_area"]}')
     print(scores["confusion_matrix"])
     print(scores["classification_report"])
-
+    df = DataFrame([[classifier_type, seed_value, model_parameters, scores["accuracy"], scores["precision"], scores["f_score"], scores["recall"], scores["roc_area"], scores["confusion_matrix"], scores["classification_report"]]])
+    df.to_csv(f"{DATA_PATH}/neural/output.csv", mode='a', header=False)
 
 def evaluate_linear_classifier(ten_fold: bool, test_images: DataFrame, test_classes: DataFrame,
-                               training_images: DataFrame, training_classes: DataFrame):
+                               training_images: DataFrame, training_classes: DataFrame, tolerance: float, c_value: float, seed_value: int, num_of_attrs: int):
     # Normalise training data set
     training_images = training_images / 255
     training_classes = training_classes.values.ravel()
 
     # Linear
     linear = LogisticRegression(max_iter=1000,
-                                tol=0.0001,
-                                C=0.1,
+                                tol=tolerance,
+                                C=c_value,
                                 class_weight='balanced',
-                                random_state=SEED).fit(training_images, training_classes)
+                                random_state=seed_value).fit(training_images, training_classes)
 
     # Normalise test data set
     test_images = test_images / 255
@@ -70,11 +70,11 @@ def evaluate_linear_classifier(ten_fold: bool, test_images: DataFrame, test_clas
 
     # Get scores and results
     linear_result = get_scores(linear, ten_fold=ten_fold, images=test_images, classes=test_classes)
-    print_scores(linear_result)
+    print_scores(linear_result, "Linear", seed_value, [num_of_attrs, tolerance, c_value, ten_fold])
 
 
 def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes: DataFrame, training_images: DataFrame,
-                            training_classes: DataFrame):
+                            training_classes: DataFrame, seed_value: int, tolerance: float, layer_sizes, max_iterations: int, num_of_attrs: int):
     # Normalise training data set
     training_images = training_images / 255
     training_classes = training_classes.values.ravel()
@@ -82,8 +82,11 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
     # # MLP (THIS IS VEEEERY SLOW)
     mlp_classifier = MLPClassifier(solver='lbfgs',  # DO NOT REMOVE THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING
                                    activation='logistic',
-                                   max_iter=1000,
-                                   random_state=SEED).fit(training_images, training_images)
+                                   max_iter=max_iterations,
+                                   hidden_layer_sizes=layer_sizes,
+                                   tol=tolerance,
+                                   batch_size=100,
+                                   random_state=seed_value).fit(training_images, training_images)
 
     # Normalise test data set
     test_images = test_images / 255
@@ -91,67 +94,193 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
 
     # Get scores and results
     mlp_result = get_scores(mlp_classifier, ten_fold, images=test_images, classes=test_classes)
-    print_scores(mlp_result)
+    print_scores(mlp_result, "MLP", seed_value, [num_of_attrs, tolerance, max_iterations, layer_sizes])
 
 
-# Mess at the minute, but does the trick
-def run_all_linear_classifier():
+TOLERANCE_VALUES = [0.0001, 0.001, 0.01, 0.1]
+C_VALUES = [0.1, 0.2, 0.3, 0.4]
+MAX_ITERATION_VALUES = [1000, 2000, 4000, 8000]
+LAYER_SIZES_VALUES = [(50,), (100,), (100, 50), (200, 100), (200, 100, 50)]
+SEED_VALUES = [818,702,754]
+
+
+def run_linear_task1(seed_value: int):
+    for tolerance in TOLERANCE_VALUES:
+        print(f"================Iterating with tolerance of {tolerance} "
+        "set=================================\n\n")
+        for c_value in C_VALUES:
+            print(f"================Iterating with c_value of {c_value} "
+            "set=================================\n\n")
+            # Fit and test using training set, without then with ten fold:
+            for tenfold in [False, True]:
+                images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
+                classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
+                test_images = images
+                test_classes = classes
+                print(f"========== Training Linear Classifier with All features, TenFold={tenfold}"
+                    f"===================================")
+                evaluate_linear_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
+                                        training_images=images, training_classes=classes, tolerance=tolerance, c_value=c_value, seed_value=seed_value, num_of_attrs=9690)
+
+                # Import TOP SELECTED FEATURES from neural_attr_selection
+                for i in TOP_SELECTED_FEATURES:
+                    images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
+                    classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
+                    test_images = images
+                    test_classes = classes
+                    print(
+                        f"========== Training Linear Classifier with {i} features, TenFold={tenfold}"
+                        f"===================================")
+                    evaluate_linear_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
+                                        training_images=images, training_classes=classes, tolerance=tolerance, c_value=c_value, seed_value=seed_value, num_of_attrs=i)
+
+
+def run_linear_task3(seed_value: int):
+    for tolerance in TOLERANCE_VALUES:
+        print(f"================Iterating with tolerance of {tolerance} "
+        "set=================================\n\n")
+        for c_value in C_VALUES:
+            print(f"================Iterating with c_value of {c_value} "
+            "set=================================\n\n")
+            images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
+            classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
+            test_images = pd.read_csv(f'{DATA_PATH}/x_test_gr_smpl.csv')
+            test_classes = pd.read_csv(f'{DATA_PATH}/y_test_smpl.csv')
+            print(f"========== Training Linear Classifier with All "
+                f"features===================================")
+            evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
+                                        training_images=images, training_classes=classes, tolerance=tolerance, c_value=c_value, seed_value=seed_value, num_of_attrs=9690)
+
+            # Import TOP SELECTED FEATURES from neural_attr_selection
+            for i in TOP_SELECTED_FEATURES:
+                images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
+                classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
+                test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/x_test_gr_smpl_top_{i}.csv')
+                test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/y_test_smpl_top_{i}.csv')
+                print(f"========== Training Linear Classifier with {i} features"
+                    f"===================================")
+                evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
+                                        training_images=images, training_classes=classes, tolerance=tolerance, c_value=c_value, seed_value=seed_value, num_of_attrs=i)
+
+
+def run_MLP_task1(seed_value: int):
+    for tolerance in TOLERANCE_VALUES:
+        print(f"================Iterating with tolerance of {tolerance} "
+        "set=================================\n\n")
+        for max_iter_value in MAX_ITERATION_VALUES:
+            print(f"================Iterating with max_iter_value of {max_iter_value} "
+            "set=================================\n\n")
+            for layer_size_value in LAYER_SIZES_VALUES:
+                print(f"================Iterating with layer_size_value of {layer_size_value} "
+                "set=================================\n\n")
+                # Fit and test using training set, without then with ten fold:
+                for tenfold in [False, True]:
+                    images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
+                    classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
+                    test_images = images
+                    test_classes = classes 
+                    print(f"========== Training MLP Classifier with All features, TenFold={tenfold}"
+                        f"===================================")
+                    evaluate_MLP_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
+                                        training_images=images, training_classes=classes, tolerance=tolerance, max_iterations=max_iter_value, layer_sizes=layer_size_value, seed_value=seed_value, num_of_attrs=9690)
+
+                    # Import TOP SELECTED FEATURES from neural_attr_selection
+                    for i in TOP_SELECTED_FEATURES:
+                        images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
+                        classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
+                        test_images = images 
+                        test_classes = classes  
+                        print(
+                            f"========== Training MLP Classifier with {i} features, TenFold={tenfold}"
+                            f"===================================")
+                        evaluate_MLP_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
+                                            training_images=images, training_classes=classes, tolerance=tolerance, max_iterations=max_iter_value, layer_sizes=layer_size_value, seed_value=seed_value, num_of_attrs=i)
+
+def run_MLP_task3(seed_value: int):
+    for tolerance in TOLERANCE_VALUES:
+        print(f"================Iterating with tolerance of {tolerance} "
+        "set=================================\n\n")
+        for max_iter_value in MAX_ITERATION_VALUES:
+            print(f"================Iterating with max_iter_value of {max_iter_value} "
+            "set=================================\n\n")
+            for layer_size_value in LAYER_SIZES_VALUES:
+                print(f"================Iterating with layer_size_value of {layer_size_value} "
+                "set=================================\n\n")
+                images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
+                classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
+                test_images = pd.read_csv(f'{DATA_PATH}/x_test_gr_smpl.csv')
+                test_classes = pd.read_csv(f'{DATA_PATH}/y_test_smpl.csv')
+                print(f"========== Training MLP Classifier with All "
+                    f"features===================================")
+                evaluate_MLP_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
+                                        training_images=images, training_classes=classes, tolerance=tolerance, max_iterations=max_iter_value, layer_sizes=layer_size_value, seed_value=seed_value, num_of_attrs=9690)
+
+                # Import TOP SELECTED FEATURES from neural_attr_selection
+                for i in TOP_SELECTED_FEATURES:
+                    images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
+                    classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
+                    test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/x_test_gr_smpl_top_{i}.csv')
+                    test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/y_test_smpl_top_{i}.csv')
+                    print(f"========== Training MLP Classifier with {i} features"
+                        f"===================================")
+                    evaluate_MLP_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
+                                            training_images=images, training_classes=classes, tolerance=tolerance, max_iterations=max_iter_value, layer_sizes=layer_size_value, seed_value=seed_value, num_of_attrs=i)
+
+
+#Run all linear classifiers for a given seed value
+def run_all_linear_classifier(seed_value: int):
+
     # Task 1 = "Using the provided training data sets, and the 10-fold cross validation"
-    print("============================TASK 1 - Training on training set, testing on training "
-          "set=================================\n\n")
-    # Fit and test using training set, without then with ten fold:
-    for tenfold in [False, True]:
-        images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
-        classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
-        test_images = images  # pd.read_csv(f'{DATA_PATH}/x_test_gr_smpl.csv')
-        test_classes = classes  # pd.read_csv(f'{DATA_PATH}/y_test_smpl.csv')
-        print(f"=================================== Training Linear Classifier with All features, TenFold={tenfold}"
-              f"===================================")
-        evaluate_linear_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
-                                   training_images=images, training_classes=classes)
-
-        # Import TOP SELECTED FEATURES from neural_attr_selection
-        for i in TOP_SELECTED_FEATURES:
-            images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
-            classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
-            test_images = images  # pd.read_csv(f'{DATA_PATH}/neural/csv/x/x_test_gr_smpl_top_{i}.csv')
-            test_classes = classes  # pd.read_csv(f'{DATA_PATH}/neural/csv/y/y_test_smpl_top_{i}.csv')
-            print(
-                f"=================================== Training Linear Classifier with {i} features, TenFold={tenfold}"
-                f"===================================")
-            evaluate_linear_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
-                                       training_images=images, training_classes=classes)
+    print("=====================TASK 1 - Training on training set, testing on training "
+          "set=====================\n\n")
+    run_linear_task1(seed_value)
+    
 
     # Task 3 = "Repeat steps 1 and 2, this time using training and testing data sets instead of the cross
     # validation.That is, build the classifier using the training data set, and test the classifier using the
     # providedtest data set. Note the accuracy"
-    print("============================TASK 3 - Training on training set, testing on testing "
-          "set=================================\n\n\n\n")
-    # Fit and test using training set, without then with ten fold:
-    images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
-    classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
-    test_images = pd.read_csv(f'{DATA_PATH}/x_test_gr_smpl.csv')
-    test_classes = pd.read_csv(f'{DATA_PATH}/y_test_smpl.csv')
-    print(f"=================================== Training Linear Classifier with All "
-          f"features===================================")
-    evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
-                               training_images=images, training_classes=classes)
+    print("=====================TASK 3 - Training on training set, testing on testing "
+          "set=====================\n\n\n\n")
+    run_linear_task3(seed_value)
 
-    # Import TOP SELECTED FEATURES from neural_attr_selection
-    for i in TOP_SELECTED_FEATURES:
-        images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
-        classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
-        test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/x_test_gr_smpl_top_{i}.csv')
-        test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/y_test_smpl_top_{i}.csv')
-        print(f"=================================== Training Linear Classifier with {i} features"
-              f"===================================")
-        evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
-                                   training_images=images, training_classes=classes)
+#Run all linear classifiers for a given seed value
+def run_all_MLP(seed_value: int):
+
+    # Task 1 = "Using the provided training data sets, and the 10-fold cross validation"
+    print("=====================TASK 1 - Training on training set, testing on training "
+          "set=====================\n\n")
+    run_MLP_task1(seed_value)
+    
+
+    # Task 3 = "Repeat steps 1 and 2, this time using training and testing data sets instead of the cross
+    # validation.That is, build the classifier using the training data set, and test the classifier using the
+    # providedtest data set. Note the accuracy"
+    print("=====================TASK 3 - Training on training set, testing on testing "
+          "set=====================\n\n\n\n")
+    run_MLP_task3(seed_value)
 
 
 def main():
+    # Perform attribute selection on the data
     # neural_attr_selection.main()
-    run_all_linear_classifier()
+
+    # Create output CSV file
+    df = DataFrame([['Type', 'Seed', 'Parameters', 'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "Confusion_Matrix", "Classification_Report"]])
+    df.to_csv(f"{DATA_PATH}/neural/output.csv", header=True)
+
+    # Loop through defined seed values
+    for i in SEED_VALUES:
+        print(
+            f"=================================== Iterating with Seed value of {i}"
+            f"===================================")
+        print(
+            f"=========================== Executing linear classifiers"
+            f"===========================")
+        run_all_linear_classifier(i)
+        print(
+            f"=========================== Executing MLP "
+            f"===========================")
+        # run_all_MLP(i)
 
 
 if __name__ == "__main__":
