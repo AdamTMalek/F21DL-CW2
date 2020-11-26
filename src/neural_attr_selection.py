@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from pandas import DataFrame
 from sklearn.metrics import confusion_matrix, classification_report, roc_curve, roc_auc_score, accuracy_score, \
     average_precision_score, f1_score, precision_score, recall_score
@@ -8,16 +9,37 @@ from sklearn.neural_network import MLPClassifier
 from pathlib import Path
 
 from data import get_data_dir_path
+
 from weka import Weka
 
 DATA_DIR = get_data_dir_path()
 WEKA_PATH = Path(f'C:/Program Files/Weka-3-8-4/weka.jar')
 TOP_SELECTED_FEATURES = [5, 10, 20, 50, 200, 500]
+DIRECTORIES = [Path(f'{DATA_DIR}/neural'), Path(f'{DATA_DIR}/neural/arff'), Path(f'{DATA_DIR}/neural/csv'), 
+                Path(f'{DATA_DIR}/neural/arff/x'), Path(f'{DATA_DIR}/neural/arff/y'), Path(f'{DATA_DIR}/neural/csv/x'), 
+                Path(f'{DATA_DIR}/neural/csv/y')]
 
+def __create_dir(path: Path) -> Path:
+    """
+    Creates the directory based on the path.
+    
+    :param path: Path for directory to be created if doesnt exist.
+    :return: Path of the new directory.
+    """
+
+    if path.exists():
+        return path
+
+    os.mkdir(path.absolute())
+    return path
 
 def main():
     # Create weka object
     weka = Weka(WEKA_PATH)
+
+    # Create directories if they dont exist 
+    for directory in DIRECTORIES:
+        __create_dir(directory)
 
     # Run for all top features
     for i in TOP_SELECTED_FEATURES:
@@ -57,6 +79,7 @@ def main():
         weka.filter_attributes(test_input_path, f'{DATA_DIR}/neural/arff/y/y_test_smpl_top_{i}.arff', [2304])
         weka.arff_to_csv(f'{DATA_DIR}/neural/arff/y/y_test_smpl_top_{i}.arff',
                          Path(f'{DATA_DIR}/neural/csv/y/y_test_smpl_top_{i}.csv'))
+
 
 
 if __name__ == "__main__":
