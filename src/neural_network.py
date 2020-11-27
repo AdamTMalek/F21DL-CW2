@@ -113,7 +113,7 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
                                    hidden_layer_sizes=layer_sizes,
                                    tol=tolerance,
                                    batch_size=100,
-                                   random_state=seed_value).fit(training_images, training_images)
+                                   random_state=seed_value).fit(training_images, training_classes)
 
     # Normalise test data set
     test_images = test_images / 255
@@ -310,7 +310,7 @@ def main():
     for i in SEED_VALUES:
         print(f"=========================== Iterating with Seed value of {i} ===========================")
         print(f"=========================== Executing linear classifiers ===========================")
-        run_all_linear_classifier(i)
+        # run_all_linear_classifier(i)
         print(f"=========================== Executing MLP ===========================")
         run_all_MLP(i)
 
