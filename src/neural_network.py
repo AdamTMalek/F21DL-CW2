@@ -78,7 +78,7 @@ def print_scores(scores: Dict, classifier_type: str, seed_value: int, model_para
 
 def evaluate_linear_classifier(ten_fold: bool, test_images: DataFrame, test_classes: DataFrame,
                                training_images: DataFrame, training_classes: DataFrame,
-                               tolerance: float, c_value: float, seed_value: int, num_of_attrs: int):
+                               tolerance: float, c_value: float, seed_value: int, num_of_attrs: int, task: int):
     # Normalise training data set
     training_images = training_images / 255
     training_classes = training_classes.values.ravel()
@@ -96,12 +96,12 @@ def evaluate_linear_classifier(ten_fold: bool, test_images: DataFrame, test_clas
 
     # Get scores and results
     linear_result = get_scores(linear, ten_fold=ten_fold, images=test_images, classes=test_classes)
-    print_scores(linear_result, "Linear", seed_value, [num_of_attrs, tolerance, c_value, ten_fold], False)
+    print_scores(linear_result, "Linear", seed_value, [task, num_of_attrs, tolerance, c_value, ten_fold], False)
 
 
 def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes: DataFrame, training_images: DataFrame,
                             training_classes: DataFrame, seed_value: int, tolerance: float,
-                            layer_sizes, max_iterations: int, num_of_attrs: int):
+                            layer_sizes, max_iterations: int, num_of_attrs: int, task: int):
     # Normalise training data set
     training_images = training_images / 255
     training_classes = training_classes.values.ravel()
@@ -121,7 +121,7 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
 
     # Get scores and results
     mlp_result = get_scores(mlp_classifier, ten_fold, images=test_images, classes=test_classes)
-    print_scores(mlp_result, "MLP", seed_value, [num_of_attrs, tolerance, max_iterations, layer_sizes], True)
+    print_scores(mlp_result, "MLP", seed_value, [task, num_of_attrs, tolerance, max_iterations, layer_sizes, ten_fold], True)
 
 
 SEED_VALUES = [818, 702, 754]
@@ -131,7 +131,7 @@ MAX_ITERATION_VALUES = [1000, 2000]
 LAYER_SIZES_VALUES = [(50,), (100,), (100, 50), (200, 100, 50)]
 
 
-def run_linear_task1(seed_value: int):
+def run_linear_task1(seed_value: int, task: int):
     for tolerance in TOLERANCE_VALUES:
         print(f"=================================== Iterating with tolerance of {tolerance}"
               f" set=================================")
@@ -148,7 +148,7 @@ def run_linear_task1(seed_value: int):
                       f" TenFold={tenfold} ===================================")
                 evaluate_linear_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
                                            training_images=images, training_classes=classes, tolerance=tolerance,
-                                           c_value=c_value, seed_value=seed_value, num_of_attrs=9690)
+                                           c_value=c_value, seed_value=seed_value, num_of_attrs=2304, task=task)
 
                 # Import TOP SELECTED FEATURES from neural_attr_selection
                 for i in TOP_SELECTED_FEATURES:
@@ -160,10 +160,10 @@ def run_linear_task1(seed_value: int):
                           f"===================================")
                     evaluate_linear_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
                                                training_images=images, training_classes=classes, tolerance=tolerance,
-                                               c_value=c_value, seed_value=seed_value, num_of_attrs=i)
+                                               c_value=c_value, seed_value=seed_value, num_of_attrs=i, task=task)
 
 
-def run_linear_task3(seed_value: int):
+def run_linear_task3(seed_value: int, task: int):
     for tolerance in TOLERANCE_VALUES:
         print(f"=================================== Iterating with tolerance of {tolerance}"
               f" set=================================")
@@ -178,7 +178,7 @@ def run_linear_task3(seed_value: int):
                   f"features===================================")
             evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
                                        training_images=images, training_classes=classes, tolerance=tolerance,
-                                       c_value=c_value, seed_value=seed_value, num_of_attrs=9690)
+                                       c_value=c_value, seed_value=seed_value, num_of_attrs=2304, task=task)
 
             # Import TOP SELECTED FEATURES from neural_attr_selection
             for i in TOP_SELECTED_FEATURES:
@@ -190,10 +190,10 @@ def run_linear_task3(seed_value: int):
                       f"===================================")
                 evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
                                            training_images=images, training_classes=classes, tolerance=tolerance,
-                                           c_value=c_value, seed_value=seed_value, num_of_attrs=i)
+                                           c_value=c_value, seed_value=seed_value, num_of_attrs=i, task=task)
 
 
-def run_MLP_task1(seed_value: int):
+def run_MLP_task1(seed_value: int, task: int):
     for tolerance in TOLERANCE_VALUES:
         print(f"=================================== Iterating with tolerance of {tolerance} set"
               f" ===================================")
@@ -214,7 +214,7 @@ def run_MLP_task1(seed_value: int):
                     evaluate_MLP_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
                                             training_images=images, training_classes=classes, tolerance=tolerance,
                                             max_iterations=max_iter_value, layer_sizes=layer_size_value,
-                                            seed_value=seed_value, num_of_attrs=9690)
+                                            seed_value=seed_value, num_of_attrs=2304, task=task)
 
                     # Import TOP SELECTED FEATURES from neural_attr_selection
                     for i in TOP_SELECTED_FEATURES:
@@ -228,10 +228,10 @@ def run_MLP_task1(seed_value: int):
                         evaluate_MLP_classifier(ten_fold=tenfold, test_images=test_images, test_classes=test_classes,
                                                 training_images=images, training_classes=classes, tolerance=tolerance,
                                                 max_iterations=max_iter_value, layer_sizes=layer_size_value,
-                                                seed_value=seed_value, num_of_attrs=i)
+                                                seed_value=seed_value, num_of_attrs=i, task=task)
 
 
-def run_MLP_task3(seed_value: int):
+def run_MLP_task3(seed_value: int, task: int):
     for tolerance in TOLERANCE_VALUES:
         print(f"=================================== Iterating with tolerance of {tolerance} "
               "set=================================")
@@ -250,7 +250,7 @@ def run_MLP_task3(seed_value: int):
                 evaluate_MLP_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
                                         training_images=images, training_classes=classes, tolerance=tolerance,
                                         max_iterations=max_iter_value, layer_sizes=layer_size_value,
-                                        seed_value=seed_value, num_of_attrs=9690)
+                                        seed_value=seed_value, num_of_attrs=2304, task=task)
 
                 # Import TOP SELECTED FEATURES from neural_attr_selection
                 for i in TOP_SELECTED_FEATURES:
@@ -263,33 +263,33 @@ def run_MLP_task3(seed_value: int):
                     evaluate_MLP_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
                                             training_images=images, training_classes=classes, tolerance=tolerance,
                                             max_iterations=max_iter_value, layer_sizes=layer_size_value,
-                                            seed_value=seed_value, num_of_attrs=i)
+                                            seed_value=seed_value, num_of_attrs=i, task=task)
 
 
 # Run all linear classifiers for a given seed value
 def run_all_linear_classifier(seed_value: int):
     # Task 1 = "Using the provided training data sets, and the 10-fold cross validation"
     print("=====================TASK 1 - Training on training set, testing on training set=====================")
-    run_linear_task1(seed_value)
+    run_linear_task1(seed_value, 1)
 
     # Task 3 = "Repeat steps 1 and 2, this time using training and testing data sets instead of the cross
     # validation.That is, build the classifier using the training data set, and test the classifier using the
-    # providedtest data set. Note the accuracy"
+    # provided test data set. Note the accuracy"
     print("=====================TASK 3 - Training on training set, testing on testing set=====================")
-    run_linear_task3(seed_value)
+    run_linear_task3(seed_value, 3)
 
 
 # Run all linear classifiers for a given seed value
 def run_all_MLP(seed_value: int):
     # Task 1 = "Using the provided training data sets, and the 10-fold cross validation"
     print("=====================TASK 1 - Training on training set, testing on training set=====================")
-    run_MLP_task1(seed_value)
+    run_MLP_task1(seed_value, 1)
 
     # Task 3 = "Repeat steps 1 and 2, this time using training and testing data sets instead of the cross
     # validation.That is, build the classifier using the training data set, and test the classifier using the
     # providedtest data set. Note the accuracy"
     print("=====================TASK 3 - Training on training set, testing on testing set=====================")
-    run_MLP_task3(seed_value)
+    run_MLP_task3(seed_value, 3)
 
 
 def main():
@@ -297,11 +297,11 @@ def main():
     # neural_attr_selection.main()
 
     # Create output CSV file
-    linear_df = DataFrame([['Type', 'Seed', 'Parameters (Number of features, Tolerance, c value, Ten Fold)',
+    linear_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, c value, Ten Fold)',
                             'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
                             "Confusion_Matrix", "Classification_Report"]])
     linear_df.to_csv(f"{EVIDENCE_PATH}/linear.csv", header=True)
-    mlp_df = DataFrame([['Type', 'Seed', 'Parameters (Number of features, Tolerance, Iterations, Ten Fold)',
+    mlp_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, Iterations, Ten Fold)',
                          'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
                          "Confusion_Matrix", "Classification_Report"]])
     mlp_df.to_csv(f"{EVIDENCE_PATH}/mlp.csv", header=True)
