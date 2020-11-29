@@ -125,10 +125,10 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
 
 
 SEED_VALUES = [818, 702, 754]
-TOLERANCE_VALUES = [0.1, 0.01, 0.001, 0.0001]
-C_VALUES = [0.1, 0.2, 0.3, 0.4]
-MAX_ITERATION_VALUES = [1000, 2000, 4000, 8000]
-LAYER_SIZES_VALUES = [(50,), (100,), (100, 50), (200, 100), (200, 100, 50)]
+TOLERANCE_VALUES = [0.001, 0.0001]
+C_VALUES = [0.1, 0.2]
+MAX_ITERATION_VALUES = [1000, 2000]
+LAYER_SIZES_VALUES = [(50,), (100,), (100, 50), (200, 100, 50)]
 
 
 def run_linear_task1(seed_value: int):
