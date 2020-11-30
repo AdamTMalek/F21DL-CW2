@@ -163,17 +163,17 @@ def run_linear_task1(seed_value: int, task: int):
                                                c_value=c_value, seed_value=seed_value, num_of_attrs=i, task=task)
 
 
-def run_linear_task3(seed_value: int, task: int):
+def run_linear(seed_value: int, task: int, base_x_train: str, base_y_train: str, base_x_test: str, base_y_test: str):
     for tolerance in TOLERANCE_VALUES:
         print(f"=================================== Iterating with tolerance of {tolerance}"
               f" set=================================")
         for c_value in C_VALUES:
             print(f"=================================== Iterating with c_value of {c_value}"
                   f" set=================================")
-            images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
-            classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
-            test_images = pd.read_csv(f'{DATA_PATH}/x_test_gr_smpl.csv')
-            test_classes = pd.read_csv(f'{DATA_PATH}/y_test_smpl.csv')
+            images = pd.read_csv(f"{DATA_PATH}/{base_x_train}.csv")
+            classes = pd.read_csv(f"{DATA_PATH}/{base_y_train}.csv")
+            test_images = pd.read_csv(f'{DATA_PATH}/{base_x_test}.csv')
+            test_classes = pd.read_csv(f'{DATA_PATH}/{base_y_test}.csv')
             print(f"=================================== Training Linear Classifier with All "
                   f"features===================================")
             evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
@@ -182,10 +182,10 @@ def run_linear_task3(seed_value: int, task: int):
 
             # Import TOP SELECTED FEATURES from neural_attr_selection
             for i in TOP_SELECTED_FEATURES:
-                images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
-                classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
-                test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/x_test_gr_smpl_top_{i}.csv')
-                test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/y_test_smpl_top_{i}.csv')
+                images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/{base_x_train}_top_{i}.csv")
+                classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/{base_y_train}_top_{i}.csv")
+                test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/{base_x_test}_top_{i}.csv')
+                test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/{base_y_test}_top_{i}.csv')
                 print(f"=================================== Training Linear Classifier with {i} features"
                       f"===================================")
                 evaluate_linear_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
@@ -231,7 +231,7 @@ def run_MLP_task1(seed_value: int, task: int):
                                                 seed_value=seed_value, num_of_attrs=i, task=task)
 
 
-def run_MLP_task3(seed_value: int, task: int):
+def run_MLP(seed_value: int, task: int, base_x_train: str, base_y_train: str, base_x_test: str, base_y_test: str):
     for tolerance in TOLERANCE_VALUES:
         print(f"=================================== Iterating with tolerance of {tolerance} "
               "set=================================")
@@ -241,10 +241,10 @@ def run_MLP_task3(seed_value: int, task: int):
             for layer_size_value in LAYER_SIZES_VALUES:
                 print(f"================Iterating with layer_size_value of {layer_size_value}"
                       f" set=================================")
-                images = pd.read_csv(f"{DATA_PATH}/x_train_gr_smpl.csv")
-                classes = pd.read_csv(f"{DATA_PATH}/y_train_smpl.csv")
-                test_images = pd.read_csv(f'{DATA_PATH}/x_test_gr_smpl.csv')
-                test_classes = pd.read_csv(f'{DATA_PATH}/y_test_smpl.csv')
+                images = pd.read_csv(f"{DATA_PATH}/{base_x_train}.csv")
+                classes = pd.read_csv(f"{DATA_PATH}/{base_y_train}.csv")
+                test_images = pd.read_csv(f'{DATA_PATH}/{base_x_test}.csv')
+                test_classes = pd.read_csv(f'{DATA_PATH}/{base_y_test}.csv')
                 print(f"=================================== Training MLP Classifier with All features"
                       f" ===================================")
                 evaluate_MLP_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
@@ -254,10 +254,10 @@ def run_MLP_task3(seed_value: int, task: int):
 
                 # Import TOP SELECTED FEATURES from neural_attr_selection
                 for i in TOP_SELECTED_FEATURES:
-                    images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/x_train_gr_smpl_top_{i}.csv")
-                    classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/y_train_smpl_top_{i}.csv")
-                    test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/x_test_gr_smpl_top_{i}.csv')
-                    test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/y_test_smpl_top_{i}.csv')
+                    images = pd.read_csv(f"{DATA_PATH}/neural/csv/x/{base_x_train}_top_{i}.csv")
+                    classes = pd.read_csv(f"{DATA_PATH}/neural/csv/y/{base_y_train}_top_{i}.csv")
+                    test_images = pd.read_csv(f'{DATA_PATH}/neural/csv/x/{base_x_test}_top_{i}.csv')
+                    test_classes = pd.read_csv(f'{DATA_PATH}/neural/csv/y/{base_y_test}_top_{i}.csv')
                     print(f"=================================== Training MLP Classifier with {i} features "
                           f"===================================")
                     evaluate_MLP_classifier(ten_fold=False, test_images=test_images, test_classes=test_classes,
@@ -276,20 +276,38 @@ def run_all_linear_classifier(seed_value: int):
     # validation.That is, build the classifier using the training data set, and test the classifier using the
     # provided test data set. Note the accuracy"
     print("=====================TASK 3 - Training on training set, testing on testing set=====================")
-    run_linear_task3(seed_value, 3)
+    run_linear(seed_value, 3, "x_train_gr_smpl", "y_train_smpl", "x_test_gr_smpl", "y_test_smpl")
+
+
+    # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training setinto the testing set.Then, repeat step 3"
+    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
+    run_linear(seed_value, 4, "x_task4000_train_gr_smpl", "y_task4000_train_smpl", "x_task4000_test_gr_smpl", "y_task4000_test_smpl")
+
+    # Task 5 = "Make new training and testing sets again, this time removing 9000 instances from the original training set and placing them into the testing set again repeat step 3."
+    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
+    run_linear(seed_value, 5, "x_task9000_train_gr_smpl", "y_task9000_train_smpl", "x_task9000_test_gr_smpl", "y_task9000_test_smpl")
 
 
 # Run all linear classifiers for a given seed value
 def run_all_MLP(seed_value: int):
     # Task 1 = "Using the provided training data sets, and the 10-fold cross validation"
     print("=====================TASK 1 - Training on training set, testing on training set=====================")
-    run_MLP_task1(seed_value, 1)
+    # run_MLP_task1(seed_value, 1)
 
     # Task 3 = "Repeat steps 1 and 2, this time using training and testing data sets instead of the cross
     # validation.That is, build the classifier using the training data set, and test the classifier using the
     # providedtest data set. Note the accuracy"
     print("=====================TASK 3 - Training on training set, testing on testing set=====================")
-    run_MLP_task3(seed_value, 3)
+    # run_MLP(seed_value, 3, "x_train_gr_smpl", "y_train_smpl", "x_test_gr_smpl", "y_test_smpl")
+
+    # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training setinto the testing set.Then, repeat step 3"
+    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
+    run_MLP(seed_value, 4, "x_task4000_train_gr_smpl", "y_task4000_train_smpl", "x_task4000_test_gr_smpl", "y_task4000_test_smpl")
+
+    # Task 5 = "Make new training and testing sets again, this time removing 9000 instances from the original training set and placing them into the testing set again repeat step 3."
+    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
+    run_MLP(seed_value, 5, "x_task9000_train_gr_smpl", "y_task9000_train_smpl", "x_task9000_test_gr_smpl", "y_task9000_test_smpl")
+
 
 
 def main():

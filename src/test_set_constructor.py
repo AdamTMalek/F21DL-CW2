@@ -4,8 +4,8 @@ import shutil
 from pathlib import Path
 from typing import Iterable
 
-from src.data import get_data_dir_path
-from src.weka import Weka
+from data import get_data_dir_path
+from weka import Weka
 
 DATA_DIR = get_data_dir_path()
 DATA_SIZE = 9690
