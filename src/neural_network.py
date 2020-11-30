@@ -269,23 +269,29 @@ def run_MLP(seed_value: int, task: int, base_x_train: str, base_y_train: str, ba
 # Run all linear classifiers for a given seed value
 def run_all_linear_classifier(seed_value: int):
     # Task 1 = "Using the provided training data sets, and the 10-fold cross validation"
-    print("=====================TASK 1 - Training on training set, testing on training set=====================")
-    run_linear_task1(seed_value, 1)
+    # print("=====================TASK 1 - Training on training set, testing on training set=====================")
+    # run_linear_task1(seed_value, 1)
 
     # Task 3 = "Repeat steps 1 and 2, this time using training and testing data sets instead of the cross
     # validation.That is, build the classifier using the training data set, and test the classifier using the
     # provided test data set. Note the accuracy"
-    print("=====================TASK 3 - Training on training set, testing on testing set=====================")
-    run_linear(seed_value, 3, "x_train_gr_smpl", "y_train_smpl", "x_test_gr_smpl", "y_test_smpl")
+    # print("=====================TASK 3 - Training on training set, testing on testing set=====================")
+    # run_linear(seed_value, 3, "x_train_gr_smpl", "y_train_smpl", "x_test_gr_smpl", "y_test_smpl")
 
 
-    # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training setinto the testing set.Then, repeat step 3"
-    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
-    run_linear(seed_value, 4, "x_task4000_train_gr_smpl", "y_task4000_train_smpl", "x_task4000_test_gr_smpl", "y_task4000_test_smpl")
+    # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training set into
+    # the testing set.Then, repeat step 3"
+    print("=====================TASK 4 - Training on smaller training set,"
+          " testing on larger testing set=====================")
+    run_linear(seed_value, 4, "x_task4000_train_gr_smpl", "y_task4000_train_smpl",
+               "x_task4000_test_gr_smpl", "y_task4000_test_smpl")
 
-    # Task 5 = "Make new training and testing sets again, this time removing 9000 instances from the original training set and placing them into the testing set again repeat step 3."
-    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
-    run_linear(seed_value, 5, "x_task9000_train_gr_smpl", "y_task9000_train_smpl", "x_task9000_test_gr_smpl", "y_task9000_test_smpl")
+    # Task 5 = "Make new training and testing sets again, this time removing 9000 instances from the original training
+    # set and placing them into the testing set again repeat step 3."
+    print("=====================TASK 4 - Training on smaller training set,"
+          " testing on larger testing set=====================")
+    run_linear(seed_value, 5, "x_task9000_train_gr_smpl", "y_task9000_train_smpl",
+               "x_task9000_test_gr_smpl", "y_task9000_test_smpl")
 
 
 # Run all linear classifiers for a given seed value
@@ -300,37 +306,43 @@ def run_all_MLP(seed_value: int):
     print("=====================TASK 3 - Training on training set, testing on testing set=====================")
     # run_MLP(seed_value, 3, "x_train_gr_smpl", "y_train_smpl", "x_test_gr_smpl", "y_test_smpl")
 
-    # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training setinto the testing set.Then, repeat step 3"
-    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
-    run_MLP(seed_value, 4, "x_task4000_train_gr_smpl", "y_task4000_train_smpl", "x_task4000_test_gr_smpl", "y_task4000_test_smpl")
+    # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training set into
+    # the testing set.Then, repeat step 3"
+    print("=====================TASK 4 - Training on smaller training set,"
+          " testing on larger testing set=====================")
+    run_MLP(seed_value, 4, "x_task4000_train_gr_smpl", "y_task4000_train_smpl",
+            "x_task4000_test_gr_smpl", "y_task4000_test_smpl")
 
-    # Task 5 = "Make new training and testing sets again, this time removing 9000 instances from the original training set and placing them into the testing set again repeat step 3."
-    print("=====================TASK 4 - Training on smaller training set, testing on larger testing set=====================")
-    run_MLP(seed_value, 5, "x_task9000_train_gr_smpl", "y_task9000_train_smpl", "x_task9000_test_gr_smpl", "y_task9000_test_smpl")
+    # Task 5 = "Make new training and testing sets again, this time removing 9000 instances from the original training
+    # set and placing them into the testing set again repeat step 3."
+    print("=====================TASK 4 - Training on smaller training set,"
+          " testing on larger testing set=====================")
+    run_MLP(seed_value, 5, "x_task9000_train_gr_smpl", "y_task9000_train_smpl",
+            "x_task9000_test_gr_smpl", "y_task9000_test_smpl")
 
 
 
 def main():
     # Perform attribute selection on the data
-    # neural_attr_selection.main()
+    neural_attr_selection.main()
 
     # Create output CSV file
     linear_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, c value, Ten Fold)',
                             'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
                             "Confusion_Matrix", "Classification_Report"]])
     linear_df.to_csv(f"{EVIDENCE_PATH}/linear.csv", header=True)
-    mlp_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, Iterations, Ten Fold)',
-                         'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
-                         "Confusion_Matrix", "Classification_Report"]])
-    mlp_df.to_csv(f"{EVIDENCE_PATH}/mlp.csv", header=True)
+    # mlp_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, Iterations, Ten Fold)',
+    #                      'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
+    #                      "Confusion_Matrix", "Classification_Report"]])
+    # mlp_df.to_csv(f"{EVIDENCE_PATH}/mlp.csv", header=True)
 
     # Loop through defined seed values
     for i in SEED_VALUES:
         print(f"=========================== Iterating with Seed value of {i} ===========================")
         print(f"=========================== Executing linear classifiers ===========================")
-        # run_all_linear_classifier(i)
+        run_all_linear_classifier(i)
         print(f"=========================== Executing MLP ===========================")
-        run_all_MLP(i)
+        # run_all_MLP(i)
 
 
 if __name__ == "__main__":
