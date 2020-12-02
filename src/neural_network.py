@@ -121,7 +121,8 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
 
     # Get scores and results
     mlp_result = get_scores(mlp_classifier, ten_fold, images=test_images, classes=test_classes)
-    print_scores(mlp_result, "MLP", seed_value, [task, num_of_attrs, tolerance, max_iterations, layer_sizes, ten_fold], True)
+    print_scores(mlp_result, "MLP", seed_value, [task, num_of_attrs, tolerance, max_iterations, layer_sizes,
+                                                 ten_fold], True)
 
 
 SEED_VALUES = [818, 702, 754]
@@ -341,7 +342,7 @@ def main():
         print(f"=========================== Iterating with Seed value of {i} ===========================")
         print(f"=========================== Executing linear classifiers ===========================")
         run_all_linear_classifier(i)
-        print(f"=========================== Executing MLP ===========================")
+        # print(f"=========================== Executing MLP ===========================")
         # run_all_MLP(i)
 
 

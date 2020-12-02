@@ -16,9 +16,10 @@ from shutil import copyfile
 DATA_DIR = get_data_dir_path()
 WEKA_PATH = Path(f'C:/Program Files/Weka-3-8-4/weka.jar')
 TOP_SELECTED_FEATURES = [5, 10, 20, 50, 200, 500]
-DIRECTORIES = [Path(f'{DATA_DIR}/neural'), Path(f'{DATA_DIR}/neural/arff'), Path(f'{DATA_DIR}/neural/csv'), 
-                Path(f'{DATA_DIR}/neural/arff/x'), Path(f'{DATA_DIR}/neural/arff/y'), Path(f'{DATA_DIR}/neural/csv/x'), 
-                Path(f'{DATA_DIR}/neural/csv/y')]
+DIRECTORIES = [Path(f'{DATA_DIR}/neural'), Path(f'{DATA_DIR}/neural/arff'), Path(f'{DATA_DIR}/neural/csv'),
+               Path(f'{DATA_DIR}/neural/arff/x'), Path(f'{DATA_DIR}/neural/arff/y'), Path(f'{DATA_DIR}/neural/csv/x'),
+               Path(f'{DATA_DIR}/neural/csv/y')]
+
 
 def __create_dir(path: Path) -> Path:
     """
@@ -33,6 +34,7 @@ def __create_dir(path: Path) -> Path:
 
     os.mkdir(path.absolute())
     return path
+
 
 def main():
     # Create weka object
@@ -85,7 +87,8 @@ def main():
         copyfile(f'{DATA_DIR}/x_train_gr_smpl.csv', f'{DATA_DIR}/x_task{task}_train_gr_smpl.csv')
         copyfile(f'{DATA_DIR}/x_test_gr_smpl.csv', f'{DATA_DIR}/x_task{task}_test_gr_smpl.csv')
 
-        __move_instances(f'{DATA_DIR}/x_task{task}_train_gr_smpl.csv', f'{DATA_DIR}/x_task{task}_test_gr_smpl.csv', task)
+        __move_instances(f'{DATA_DIR}/x_task{task}_train_gr_smpl.csv', f'{DATA_DIR}/x_task{task}_test_gr_smpl.csv',
+                         task)
 
         copyfile(f'{DATA_DIR}/y_train_smpl.csv', f'{DATA_DIR}/y_task{task}_train_smpl.csv')
         copyfile(f'{DATA_DIR}/y_test_smpl.csv', f'{DATA_DIR}/y_task{task}_test_smpl.csv')
@@ -93,15 +96,21 @@ def main():
         __move_instances(f'{DATA_DIR}/y_task{task}_train_smpl.csv', f'{DATA_DIR}/y_task{task}_test_smpl.csv', task)
 
         for i in TOP_SELECTED_FEATURES:
-            copyfile(f'{DATA_DIR}/neural/csv/x/x_train_gr_smpl_top_{i}.csv', f'{DATA_DIR}/neural/csv/x/x_task{task}_train_gr_smpl_top_{i}.csv')
-            copyfile(f'{DATA_DIR}/neural/csv/x/x_test_gr_smpl_top_{i}.csv', f'{DATA_DIR}/neural/csv/x/x_task{task}_test_gr_smpl_top_{i}.csv')
+            copyfile(f'{DATA_DIR}/neural/csv/x/x_train_gr_smpl_top_{i}.csv',
+                     f'{DATA_DIR}/neural/csv/x/x_task{task}_train_gr_smpl_top_{i}.csv')
+            copyfile(f'{DATA_DIR}/neural/csv/x/x_test_gr_smpl_top_{i}.csv',
+                     f'{DATA_DIR}/neural/csv/x/x_task{task}_test_gr_smpl_top_{i}.csv')
 
-            __move_instances(f'{DATA_DIR}/neural/csv/x/x_task{task}_train_gr_smpl_top_{i}.csv', f'{DATA_DIR}/neural/csv/x/x_task{task}_test_gr_smpl_top_{i}.csv', task)
+            __move_instances(f'{DATA_DIR}/neural/csv/x/x_task{task}_train_gr_smpl_top_{i}.csv',
+                             f'{DATA_DIR}/neural/csv/x/x_task{task}_test_gr_smpl_top_{i}.csv', task)
 
-            copyfile(f'{DATA_DIR}/neural/csv/y/y_train_smpl_top_{i}.csv', f'{DATA_DIR}/neural/csv/y/y_task{task}_train_smpl_top_{i}.csv')
-            copyfile(f'{DATA_DIR}/neural/csv/y/y_test_smpl_top_{i}.csv', f'{DATA_DIR}/neural/csv/y/y_task{task}_test_smpl_top_{i}.csv')
+            copyfile(f'{DATA_DIR}/neural/csv/y/y_train_smpl_top_{i}.csv',
+                     f'{DATA_DIR}/neural/csv/y/y_task{task}_train_smpl_top_{i}.csv')
+            copyfile(f'{DATA_DIR}/neural/csv/y/y_test_smpl_top_{i}.csv',
+                     f'{DATA_DIR}/neural/csv/y/y_task{task}_test_smpl_top_{i}.csv')
 
-            __move_instances(f'{DATA_DIR}/neural/csv/y/y_task{task}_train_smpl_top_{i}.csv', f'{DATA_DIR}/neural/csv/y/y_task{task}_test_smpl_top_{i}.csv', task)
+            __move_instances(f'{DATA_DIR}/neural/csv/y/y_task{task}_train_smpl_top_{i}.csv',
+                             f'{DATA_DIR}/neural/csv/y/y_task{task}_test_smpl_top_{i}.csv', task)
 
 
 if __name__ == "__main__":
