@@ -181,7 +181,7 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
 # Values that will be iterated through by the testing code
 SEED_VALUES = [818, 702, 754]
 TOLERANCE_VALUES = [0.001, 0.0001]
-C_VALUES = [0.1, 0.2]
+C_VALUES = [1000, 1, 0.0001]
 MAX_ITERATION_VALUES = [1000, 2000]
 LAYER_SIZES_VALUES = [(50,), (100,), (100, 50), (200, 100, 50)]
 
@@ -233,10 +233,14 @@ def run_linear(seed_value: int, task: int, base_x_train: str, base_y_train: str,
     Run all Linear classifiers for a given set of data and seed value.
     :param seed_value: Seed value to build the model with
     :param task: Task number only used for CSV printing
-    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
+    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as
+     the 4000 removed training set
+    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000
+     removed training set
     """
 
     # Iterate through all tolerance values
@@ -329,10 +333,14 @@ def run_MLP(seed_value: int, task: int, base_x_train: str, base_y_train: str, ba
     Run all MLP classifiers for a given set of data and seed value.
     :param seed_value: Seed value to build the model with
     :param task: Task number only used for CSV printing
-    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
+    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as
+     the 4000 removed training set
+    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000
+     removed training set
     """
 
     # Iterate through all tolerance values
@@ -450,18 +458,18 @@ def main():
                             'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
                             "Confusion_Matrix", "Classification_Report"]])
     linear_df.to_csv(f"{EVIDENCE_PATH}/linear.csv", header=True)
-    mlp_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, Iterations, Ten Fold)',
-                         'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
-                         "Confusion_Matrix", "Classification_Report"]])
-    mlp_df.to_csv(f"{EVIDENCE_PATH}/mlp.csv", header=True)
+    # mlp_df = DataFrame([['Type', 'Seed', 'Parameters (Task, Number of features, Tolerance, Iterations, Ten Fold)',
+    #                      'Accuracy', 'Precision', 'F_Score', 'Recall', "ROC_Area", "TP Rate", "FP Rate",
+    #                      "Confusion_Matrix", "Classification_Report"]])
+    # mlp_df.to_csv(f"{EVIDENCE_PATH}/mlp.csv", header=True)
 
     # Loop through defined seed values
     for i in SEED_VALUES:
         print(f"=========================== Iterating with Seed value of {i} ===========================")
         print(f"=========================== Executing linear classifiers ===========================")
         run_all_linear_classifier(i)
-        print(f"=========================== Executing MLP ===========================")
-        run_all_MLP(i)
+        # print(f"=========================== Executing MLP ===========================")
+        # run_all_MLP(i)
 
 
 if __name__ == "__main__":
