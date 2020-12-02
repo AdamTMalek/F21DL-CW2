@@ -136,7 +136,7 @@ def evaluate_linear_classifier(ten_fold: bool, test_images: DataFrame, test_clas
 
     # Get scores and results
     linear_result = get_scores(linear, ten_fold=ten_fold, images=test_images, classes=test_classes)
-    print_scores(linear_result, "Linear", seed_value, [task, num_of_attrs, tolerance, c_value, ten_fold], False)
+    print_scores(linear_result, "Linear", seed_value, [task, num_of_attrs, tolerance, c_value, ten_fold])
 
 
 def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes: DataFrame, training_images: DataFrame,
@@ -175,7 +175,7 @@ def evaluate_MLP_classifier(ten_fold: bool, test_images: DataFrame, test_classes
     # Get scores and results
     mlp_result = get_scores(mlp_classifier, ten_fold, images=test_images, classes=test_classes)
     print_scores(mlp_result, "MLP", seed_value, [task, num_of_attrs, tolerance, max_iterations, layer_sizes,
-                                                 ten_fold], True)
+                                                 ten_fold])
 
 
 # Values that will be iterated through by the testing code
