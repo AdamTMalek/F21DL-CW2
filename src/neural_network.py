@@ -17,7 +17,8 @@ EVIDENCE_PATH = get_evidence_dir_path()
 # 
 def get_scores(classifier, ten_fold: bool, images: DataFrame, classes: DataFrame) -> Dict:
     """
-    Pass in the classifier, data and whether it is calculating for ten fold, and return a dictionary containing the results for various statistics
+    Pass in the classifier, data and whether it is calculating for ten fold, and return a dictionary containing the
+    results for various statistics
 
     :param classifier: Classifier object, either MLP or Linear
     :param ten_fold: Whether the classifier is running 10 fold validation or not
@@ -233,10 +234,14 @@ def run_linear(seed_value: int, task: int, base_x_train: str, base_y_train: str,
     Run all Linear classifiers for a given set of data and seed value.
     :param seed_value: Seed value to build the model with
     :param task: Task number only used for CSV printing
-    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
+    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as
+    the 4000 removed training set
+    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000
+     removed training set
     """
 
     # Iterate through all tolerance values
@@ -329,10 +334,14 @@ def run_MLP(seed_value: int, task: int, base_x_train: str, base_y_train: str, ba
     Run all MLP classifiers for a given set of data and seed value.
     :param seed_value: Seed value to build the model with
     :param task: Task number only used for CSV printing
-    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
-    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000 removed training set
+    :param base_x_train: Base X training set name, e.g. "x_train_gr_smpl". Allows easy swapping of data sets, such as
+     the 4000 removed training set
+    :param base_y_train: Base Y training set name, e.g. "y_train_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_x_test: Base X test set name, e.g. "x_test_gr_smpl". Allows easy swapping of data sets, such as the
+     4000 removed training set
+    :param base_y_test: Base Y test set name, e.g. "y_test_smpl". Allows easy swapping of data sets, such as the 4000
+     removed training set
     """
 
     # Iterate through all tolerance values
@@ -390,7 +399,6 @@ def run_all_linear_classifier(seed_value: int):
     # provided test data set. Note the accuracy"
     print("=====================TASK 3 - Training on training set, testing on testing set=====================")
     run_linear(seed_value, 3, "x_train_gr_smpl", "y_train_smpl", "x_test_gr_smpl", "y_test_smpl")
-
 
     # Task 4 = "Make new training and testing sets, by moving 4000 of the instances from the original training set into
     # the testing set.Then, repeat step 3"
